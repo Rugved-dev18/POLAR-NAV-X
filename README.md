@@ -47,7 +47,7 @@ The system is designed with a modular architecture consisting of:
 - [Team Member 3] - [Sarthak Wawre]
 - [Team Member 4] - [Siddhant Khedekar]
 - [Team Member 5] - [Maithili Patil]
-- [Team Member 4] - [Sakib Shaikh]
+- [Team Member 6] - [Sakib Shaikh]
 
 ## Project Structure
 
@@ -76,7 +76,7 @@ POLAR NAV-X/
 
 ## License
 
-[To be determined]
+[MIT License}
 
 ## Contact
 
