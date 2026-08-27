@@ -42,10 +42,12 @@ The system is designed with a modular architecture consisting of:
 
 ## Team Contributions
 
-- [Team Member 1] - [Role/Contribution]
-- [Team Member 2] - [Role/Contribution]
-- [Team Member 3] - [Role/Contribution]
-- [Team Member 4] - [Role/Contribution]
+- [Team Member 1] - [Asim Malik]
+- [Team Member 2] - [Rugved Narkar]
+- [Team Member 3] - [Sarthak Wawre]
+- [Team Member 4] - [Siddhant Khedekar]
+- [Team Member 5] - [Maithili Patil]
+- [Team Member 4] - [Sakib Shaikh]
 
 ## Project Structure
 
