@@ -1,0 +1,19 @@
+/* Reset defaults for a clean, full-screen map-centric layout */
+html,
+body,
+#root,
+.app-container {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f4f7f6; /* Modern off-white backdrop */
+}
+
+/* Ensure Leaflet controls are styled correctly */
+.leaflet-container {
+  font-family: inherit;
+  background: #aad3df; /* Gives ocean area a clean light blue background before tiles load */
+}
