@@ -67,7 +67,7 @@ POLAR NAV-X/
 ## Development Status
 
 - [x] Step 1: Project Setup
-- [ ] Step 2: Data Collection and Processing
+- [x] Step 2: Data Collection and Processing
 - [ ] Step 3: ML Model Development
 - [ ] Step 4: Routing Algorithm Implementation
 - [ ] Step 5: Backend API Development
@@ -76,7 +76,7 @@ POLAR NAV-X/
 
 ## License
 
-[MIT License}
+[MIT License]
 
 ## Contact
 
