@@ -1,25 +1,35 @@
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { type Iceberg } from '../data/mockIcebergs';
 
-/**
- * Iceberg interface represents the data structure for an individual iceberg tracked by the system.
- */
-export interface Iceberg {
-  id: string;
-  latitude: number;
-  longitude: number;
-  status: string;
-}
+// Re-export type for compatibility
+export type { Iceberg };
 
-// L.divIcon is a Leaflet feature that generates a custom market symbol using raw HTML.
-// Here we use a snowflake emoji (❄️). It serves as a distinct symbol separate from default markers.
+const getRiskColor = (risk?: string) => {
+  switch (risk) {
+    case 'HIGH':
+      return '#ef4444';
+    case 'MEDIUM':
+      return '#f59e0b';
+    case 'LOW':
+    default:
+      return '#10b981';
+  }
+};
+
 const icebergIcon = L.divIcon({
-  html: `<div style="font-size: 24px; text-align: center; line-height: 30px; user-select: none;">❄️</div>`,
+  html: `<div style="
+    font-size: 22px; 
+    text-align: center; 
+    line-height: 28px; 
+    user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  ">🧊</div>`,
   className: 'iceberg-div-icon',
   iconSize: [30, 30],
-  iconAnchor: [15, 15],     // Center point of the icon (matches half the iconSize coordinate)
-  popupAnchor: [0, -15],     // Where the popup anchor point should open relative to the iconAnchor
+  iconAnchor: [15, 15],
+  popupAnchor: [0, -15],
 });
 
 interface IcebergMarkerProps {
@@ -28,27 +38,37 @@ interface IcebergMarkerProps {
 
 /**
  * IcebergMarker component renders a Leaflet marker at the coordinate positions [latitude, longitude].
- * In React Leaflet:
- * - <Marker> takes a geographic coordinate and custom Leaflet Icon.
- * - <Popup> intercepts marker left-clicks automatically, opening a detailed info bubble.
  */
 export const IcebergMarker: React.FC<IcebergMarkerProps> = ({ iceberg }) => {
+  const riskColor = getRiskColor(iceberg.riskLevel);
+
   return (
     <Marker 
       position={[iceberg.latitude, iceberg.longitude]} 
       icon={icebergIcon}
     >
-      <Popup>
-        <div style={{ fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '1.5' }}>
-          <h4 style={{ margin: '0 0 6px 0', borderBottom: '1px solid #e1e4e6', paddingBottom: '4px', color: '#111827' }}>
-            Iceberg Tracked
-          </h4>
+      <Popup className="iceberg-popup">
+        <div style={{ fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '1.5', minWidth: '160px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
+            <strong style={{ color: '#0f172a', fontSize: '14px' }}>{iceberg.name || iceberg.id}</strong>
+            <span style={{ 
+              backgroundColor: riskColor, 
+              color: '#ffffff', 
+              fontSize: '10px', 
+              fontWeight: 'bold', 
+              padding: '2px 6px', 
+              borderRadius: '4px' 
+            }}>
+              {iceberg.riskLevel || 'NORISK'}
+            </span>
+          </div>
           <div><strong>ID:</strong> {iceberg.id}</div>
           <div><strong>Lat:</strong> {iceberg.latitude.toFixed(4)}</div>
           <div><strong>Lng:</strong> {iceberg.longitude.toFixed(4)}</div>
+          {iceberg.sizeKm2 && <div><strong>Area:</strong> {iceberg.sizeKm2} km²</div>}
           <div>
             <strong>Status:</strong>{' '}
-            <span style={{ color: '#0ea5e9', fontWeight: 'bold' }}>{iceberg.status}</span>
+            <span style={{ color: '#0284c7', fontWeight: 'bold' }}>{iceberg.status}</span>
           </div>
         </div>
       </Popup>
