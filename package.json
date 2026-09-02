@@ -1,0 +1,8 @@
+{
+  "name": "polar-nav-x-root",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
+  }
+}

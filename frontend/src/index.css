@@ -9,11 +9,251 @@ body,
   height: 100vh;
   overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background-color: #f4f7f6; /* Modern off-white backdrop */
+  background-color: #0f172a; /* Deep polar ocean dark theme */
+  color: #f8fafc;
 }
 
-/* Ensure Leaflet controls are styled correctly */
+/* Ensure Leaflet containers render full screen with clean background */
 .leaflet-container {
   font-family: inherit;
-  background: #aad3df; /* Gives ocean area a clean light blue background before tiles load */
+  background: #0284c7;
+  z-index: 1;
+}
+
+/* Floating Route Information Overlay Panel (Top-Left) */
+.route-info-panel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  width: 260px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease-in-out;
+}
+
+.route-info-panel:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 12px 28px -5px rgba(14, 165, 233, 0.2);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.panel-icon {
+  font-size: 20px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.info-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.text-highlight {
+  color: #7dd3fc;
+  font-size: 12px;
+  max-width: 140px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Risk badges */
+.risk-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.risk-low {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.risk-medium {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.risk-high {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.status-recommended {
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.fastapi-prep-footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backend-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Floating Layer Control Panel (Top-Right) */
+.map-layer-control-panel {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  width: 220px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.control-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-icon {
+  font-size: 18px;
+}
+
+.control-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f1f5f9;
+  text-transform: uppercase;
+}
+
+.control-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layer-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.layer-toggle-item:hover {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.layer-toggle-item.active {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.layer-toggle-item input[type="checkbox"] {
+  accent-color: #0284c7;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.toggle-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-grow: 1;
+  margin-left: 8px;
+}
+
+.layer-symbol {
+  font-size: 14px;
+}
+
+.layer-badge {
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.status-badge {
+  background: rgba(14, 165, 233, 0.25);
+  color: #38bdf8;
+}
+
+/* Custom Marker Styling */
+.iceberg-div-icon, .start-marker-icon, .destination-marker-icon {
+  transition: transform 0.2s ease;
+}
+
+.iceberg-div-icon:hover, .start-marker-icon:hover, .destination-marker-icon:hover {
+  transform: scale(1.15);
 }

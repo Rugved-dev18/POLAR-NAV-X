@@ -1,45 +1,111 @@
+import React, { useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Iceberg } from './IcebergMarker';
-import { IcebergMarker } from './IcebergMarker';
 
-// Hardcoded array of icebergs typed as Iceberg[] following the requested format.
-// Contains real reference points in the southern polar region.
-const initialIcebergs: Iceberg[] = [
-  { id: "ICE-001", latitude: -64.1466, longitude: -56.6418, status: "Test Data" },
-  { id: "ICE-002", latitude: -65.2500, longitude: -64.0000, status: "Drifting" },
-  { id: "ICE-003", latitude: -70.5000, longitude: -10.0000, status: "Stationary Shelf" }
-];
+import { IcebergLayer } from './IcebergLayer';
+import { RouteLayer } from './RouteLayer';
+import { StartMarker } from './StartMarker';
+import { DestinationMarker } from './DestinationMarker';
+import { MapLayerControl, type LayerVisibilityState } from './MapLayerControl';
+import { mockRoute } from '../data/mockRoute';
+import { mockIcebergs } from '../data/mockIcebergs';
 
 /**
- * AntarcticMap is the core map visualization container.
- * In this version, we map over the typed 'initialIcebergs' array to dynamically
- * render an <IcebergMarker> for each item inside the Leaflet <MapContainer>.
+ * AntarcticMap is the central map component displaying separate geospatial layers,
+ * navigation route visualization, start/destination markers, layer controls, and a route info panel.
  */
-export const AntarcticMap = () => {
-  const center: [number, number] = [-75, 0];
-  const zoom = 3;
+export const AntarcticMap: React.FC = () => {
+  // Map viewport default coordinates centered over the Antarctic Peninsula route
+  const center: [number, number] = [-66.0, -66.0];
+  const zoom = 5;
+
+  // Layer visibility state
+  const [layers, setLayers] = useState<LayerVisibilityState>({
+    icebergs: true,
+    route: true,
+    startDestination: true
+  });
+
+  const handleToggleLayer = (layerKey: keyof LayerVisibilityState) => {
+    setLayers(prev => ({
+      ...prev,
+      [layerKey]: !prev[layerKey]
+    }));
+  };
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      scrollWheelZoom={true}
-      style={{ height: '100vh', width: '100%' }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '100vh' }}>
       
-      {/* 
-        In React, we use the Javascript .map() function on arrays to dynamically generate list elements.
-        The 'key' attribute helps React optimize rendering when items change.
-      */}
-      {initialIcebergs.map((iceberg) => (
-        <IcebergMarker key={iceberg.id} iceberg={iceberg} />
-      ))}
-    </MapContainer>
+      {/* Route Information Overlay Panel */}
+      <div className="route-info-panel">
+        <div className="panel-header">
+          <span className="panel-icon">⚓</span>
+          <h3>ROUTE INFORMATION</h3>
+        </div>
+        <div className="panel-content">
+          <div className="info-row">
+            <span className="info-label">Route Name:</span>
+            <span className="info-value text-highlight">{mockRoute.name}</span>
+          </div>
+          <div className="info-row">
+            <span className="info-label">Distance:</span>
+            <span className="info-value">{mockRoute.distanceKm} km</span>
+          </div>
+          <div className="info-row">
+            <span className="info-label">Risk:</span>
+            <span className={`risk-badge risk-${mockRoute.riskLevel.toLowerCase()}`}>
+              {mockRoute.riskLevel}
+            </span>
+          </div>
+          <div className="info-row">
+            <span className="info-label">Status:</span>
+            <span className="status-recommended">{mockRoute.status}</span>
+          </div>
+          <div className="info-row">
+            <span className="info-label">Est. Time:</span>
+            <span className="info-value">{mockRoute.estimatedTimeHours} hrs</span>
+          </div>
+        </div>
+        <div className="fastapi-prep-footer">
+          <span className="backend-tag">⚡ FastAPI Ready</span>
+        </div>
+      </div>
+
+      {/* Layer Controls Panel */}
+      <MapLayerControl 
+        layers={layers} 
+        onToggleLayer={handleToggleLayer}
+        icebergCount={mockIcebergs.length}
+      />
+
+      {/* Main Leaflet Map Container */}
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        scrollWheelZoom={true}
+        style={{ height: '100%', width: '100%' }}
+      >
+        {/* Base Map Tile Layer */}
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {/* Iceberg Layer */}
+        {layers.icebergs && <IcebergLayer icebergs={mockIcebergs} />}
+
+        {/* Navigation Route Layer */}
+        {layers.route && <RouteLayer routeData={mockRoute} />}
+
+        {/* Start & Destination Markers Layer */}
+        {layers.startDestination && (
+          <>
+            <StartMarker location={mockRoute.startLocation} />
+            <DestinationMarker location={mockRoute.destinationLocation} />
+          </>
+        )}
+      </MapContainer>
+    </div>
   );
 };
 
