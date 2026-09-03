@@ -1,6 +1,6 @@
 # Polar Nav X — Iceberg Trajectory Standardization
 
-Source: `antarctic_iceberg_trajectories_CLEANED.csv` (the previously cleaned file — not modified by this step).
+Source: `antarctic_iceberg_trajectories_CLEANED.csv` 
 Output: `PolarNavX_Iceberg_Trajectory_Standardized.csv`
 
 ## Original columns (source → CLEANED file)
@@ -22,7 +22,6 @@ Output: `PolarNavX_Iceberg_Trajectory_Standardized.csv`
 | `delta_longitude` | derived | `longitude − previous_longitude` |
 | `time_difference` | derived | Days between this observation and the prior one for the same iceberg |
 
-**Dropped from this file** (kept in the CLEANED file, not deleted from the project): `year, doy_sin, doy_cos, is_interpolated, n_sensors_reporting, days_since_first_seen, obs_number, days_gap, bearing_deg, length_nm, width_nm, aspect_ratio, likely_sensor_jump`. These weren't part of the requested 7-column + 5-feature schema; pull them back in from the CLEANED file later if needed for feature engineering.
 
 ## Transformations performed
 1. Renamed columns per the schema above.
@@ -54,7 +53,4 @@ Output: `PolarNavX_Iceberg_Trajectory_Standardized.csv`
 - **Date range:** 1976-02-01 to 2026-04-30
 - **Unique icebergs:** 647
 
-## Verification performed
-Reloaded `PolarNavX_Iceberg_Trajectory_Standardized.csv` fresh with pandas and confirmed: `date` parses as datetime; `latitude`, `longitude`, `distance_to_perimeter`, `speed`, and all five derived feature columns are numeric; latitude/longitude ranges are valid; and row order is `iceberg_id` → `date` as required.
 
-XGBoost training was **not** performed at this stage, per instructions.
