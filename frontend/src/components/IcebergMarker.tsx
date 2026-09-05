@@ -52,33 +52,41 @@ const createIcebergIcon = (riskLevel: string, size: number) => {
 
 interface IcebergMarkerProps {
   iceberg: Iceberg;
+  onSelectIceberg?: (iceberg: Iceberg) => void;
 }
 
 /**
  * IcebergMarker component renders a Leaflet marker using custom PNG icon with dynamic zoom-scaled iconSize.
  */
-export const IcebergMarker: React.FC<IcebergMarkerProps> = ({ iceberg }) => {
+export const IcebergMarker: React.FC<IcebergMarkerProps> = ({ iceberg, onSelectIceberg }) => {
   // Dynamic icon sizing scaled with zoom level (baseSize=32, baseZoom=5, minSize=18, maxSize=64)
   const size = useZoomScaledSize(32, 5, 18, 64);
   const icon = createIcebergIcon(iceberg.riskLevel, size);
   const riskColor = getRiskColor(iceberg.riskLevel);
 
   return (
-    <Marker 
-      position={[iceberg.latitude, iceberg.longitude]} 
+    <Marker
+      position={[iceberg.latitude, iceberg.longitude]}
       icon={icon}
+      eventHandlers={{
+        click: () => {
+          if (onSelectIceberg) {
+            onSelectIceberg(iceberg);
+          }
+        },
+      }}
     >
       <Popup className="iceberg-popup">
         <div style={{ fontFamily: 'system-ui, sans-serif', fontSize: '13px', lineHeight: '1.5', minWidth: '170px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px' }}>
             <strong style={{ color: '#0f172a', fontSize: '14px' }}>{iceberg.name || iceberg.id}</strong>
-            <span style={{ 
-              backgroundColor: riskColor, 
-              color: '#ffffff', 
-              fontSize: '10px', 
-              fontWeight: 'bold', 
-              padding: '2px 6px', 
-              borderRadius: '4px' 
+            <span style={{
+              backgroundColor: riskColor,
+              color: '#ffffff',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              padding: '2px 6px',
+              borderRadius: '4px'
             }}>
               {iceberg.riskLevel || 'NORISK'}
             </span>
@@ -89,7 +97,7 @@ export const IcebergMarker: React.FC<IcebergMarkerProps> = ({ iceberg }) => {
           {iceberg.sizeKm2 && <div><strong>Area:</strong> {iceberg.sizeKm2} km²</div>}
           <div>
             <strong>Status:</strong>{' '}
-            <span style={{ color: '#0284c7', fontWeight: 'bold' }}>{iceberg.status}</span>
+            <span style={{ color: '#0284c7', fontWeight: 'bold' }}>{iceberg.currentStatus || iceberg.status}</span>
           </div>
           {iceberg.lastObserved && <div><strong>Observed:</strong> {iceberg.lastObserved}</div>}
           {iceberg.source && <div><strong>Source:</strong> <span style={{ color: '#64748b', fontSize: '11px' }}>{iceberg.source}</span></div>}
