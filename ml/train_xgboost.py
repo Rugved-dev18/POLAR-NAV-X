@@ -12,59 +12,24 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+from features import (
+    FEATURES,
+    TARGETS,
+    longitude_difference,
+    longitude_to_sin_cos,
+    sin_cos_to_longitude,
+    wrap_longitude,
+)
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_PATH = REPO_ROOT / "data" / "processed" / "PolarNavX_XGBoost_Training.csv"
 DEFAULT_MODELS_DIR = REPO_ROOT / "ml" / "models"
-
-# Input features (as specified)
-FEATURES = [
-    'latitude',
-    'longitude',
-    'previous_latitude',
-    'previous_longitude',
-    'delta_latitude',
-    'delta_longitude_wrapped',
-    'time_difference',
-    'speed',
-    'lat_velocity',
-    'lon_velocity',
-    'movement_distance_deg',
-    'movement_rate_deg_per_day',
-    'year',
-    'month',
-    'day_of_year',
-    'target_time_difference'
-]
-
-# Target variables
-TARGETS = ['target_latitude', 'target_longitude']
 
 # Date columns kept for the temporal split only (never used as features)
 DATE_COLUMNS = ['date', 'target_date']
 
 # Columns to exclude from the feature matrix
 EXCLUDE_COLUMNS = ['iceberg_id', 'date', 'target_date', 'sensor']
-
-
-def wrap_longitude(longitude):
-    """Normalize longitude values to the canonical (-180, 180] range"""
-    return (np.asarray(longitude, dtype=float) + 180.0) % 360.0 - 180.0
-
-
-def longitude_difference(lon_a, lon_b):
-    """Signed minimal angular difference (degrees) between two longitudes"""
-    return wrap_longitude(np.asarray(lon_a, dtype=float) - np.asarray(lon_b, dtype=float))
-
-
-def longitude_to_sin_cos(longitude):
-    """Encode longitude as sine/cosine components of its angle"""
-    radians = np.radians(wrap_longitude(longitude))
-    return np.sin(radians), np.cos(radians)
-
-
-def sin_cos_to_longitude(sin_component, cos_component):
-    """Decode sine/cosine components back to a canonical longitude in degrees"""
-    return wrap_longitude(np.degrees(np.arctan2(sin_component, cos_component)))
 
 
 def load_and_preprocess_data(data_path):

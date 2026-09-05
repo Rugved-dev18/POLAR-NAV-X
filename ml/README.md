@@ -134,7 +134,8 @@ pip install pandas xgboost scikit-learn numpy
 - `ml/models/longitude_sin_model.json` - Sine component of the longitude prediction
 - `ml/models/longitude_cos_model.json` - Cosine component of the longitude prediction
 
-Trained artifacts are not committed; run the script to regenerate them.
+These artifacts are committed so the backend can serve them directly; re-run the
+script to regenerate them after any pipeline change.
 
 ### Tests
 
