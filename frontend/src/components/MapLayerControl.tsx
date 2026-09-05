@@ -2,6 +2,9 @@ import React from 'react';
 
 export interface LayerVisibilityState {
   icebergs: boolean;
+  heatmap: boolean;
+  seaIce: boolean;
+  oceanCurrents: boolean;
   route: boolean;
   startDestination: boolean;
 }
@@ -18,7 +21,7 @@ interface MapLayerControlProps {
 export const MapLayerControl: React.FC<MapLayerControlProps> = ({
   layers,
   onToggleLayer,
-  icebergCount = 5,
+  icebergCount = 8,
 }) => {
   return (
     <div className="map-layer-control-panel">
@@ -26,7 +29,7 @@ export const MapLayerControl: React.FC<MapLayerControlProps> = ({
         <span className="control-icon">🗺️</span>
         <span className="control-title">Map Layers</span>
       </div>
-      
+
       <div className="control-items">
         <label className={`layer-toggle-item ${layers.icebergs ? 'active' : ''}`}>
           <input
@@ -38,6 +41,42 @@ export const MapLayerControl: React.FC<MapLayerControlProps> = ({
             <span className="layer-symbol">🧊</span> Iceberg Layer
           </span>
           <span className="layer-badge">{icebergCount}</span>
+        </label>
+
+        <label className={`layer-toggle-item ${layers.heatmap ? 'active' : ''}`}>
+          <input
+            type="checkbox"
+            checked={layers.heatmap}
+            onChange={() => onToggleLayer('heatmap')}
+          />
+          <span className="toggle-label">
+            <span className="layer-symbol">🔥</span> Risk Heatmap
+          </span>
+          <span className="layer-badge status-badge">Density</span>
+        </label>
+
+        <label className={`layer-toggle-item ${layers.seaIce ? 'active' : ''}`}>
+          <input
+            type="checkbox"
+            checked={layers.seaIce}
+            onChange={() => onToggleLayer('seaIce')}
+          />
+          <span className="toggle-label">
+            <span className="layer-symbol">❄️</span> Sea-Ice Extent
+          </span>
+          <span className="layer-badge status-badge">4 Zones</span>
+        </label>
+
+        <label className={`layer-toggle-item ${layers.oceanCurrents ? 'active' : ''}`}>
+          <input
+            type="checkbox"
+            checked={layers.oceanCurrents}
+            onChange={() => onToggleLayer('oceanCurrents')}
+          />
+          <span className="toggle-label">
+            <span className="layer-symbol">🌊</span> Ocean Currents
+          </span>
+          <span className="layer-badge status-badge">Vectors</span>
         </label>
 
         <label className={`layer-toggle-item ${layers.route ? 'active' : ''}`}>

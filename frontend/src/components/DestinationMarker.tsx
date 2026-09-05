@@ -2,26 +2,13 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { type RoutePoint, mockDestinationPoint } from '../data/mockRoute';
+import destinationPng from '../assets/icons/destination.png';
 
-const destinationIcon = L.divIcon({
-  html: `<div style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ef4444;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  ">🏁</div>`,
-  className: 'destination-marker-icon',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -16],
+const destinationIcon = L.icon({
+  iconUrl: destinationPng,
+  iconSize: [22, 22],
+  iconAnchor: [11, 20],
+  popupAnchor: [0, -18],
 });
 
 interface DestinationMarkerProps {

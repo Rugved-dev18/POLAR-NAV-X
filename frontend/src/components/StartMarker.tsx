@@ -2,26 +2,13 @@ import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { type RoutePoint, mockStartPoint } from '../data/mockRoute';
+import startPng from '../assets/icons/start.png';
 
-const startIcon = L.divIcon({
-  html: `<div style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #10b981;
-    color: white;
-    font-weight: bold;
-    font-size: 14px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  ">🚩</div>`,
-  className: 'start-marker-icon',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -16],
+const startIcon = L.icon({
+  iconUrl: startPng,
+  iconSize: [22, 22],
+  iconAnchor: [11, 20],
+  popupAnchor: [0, -18],
 });
 
 interface StartMarkerProps {

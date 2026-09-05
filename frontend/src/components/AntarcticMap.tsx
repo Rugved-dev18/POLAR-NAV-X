@@ -1,107 +1,188 @@
-import React, { useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Polyline, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
+import L from 'leaflet';
 import { IcebergLayer } from './IcebergLayer';
+import { HeatmapLayer } from './HeatmapLayer';
+import { SeaIceLayer } from './SeaIceLayer';
+import { OceanCurrentsLayer } from './OceanCurrentsLayer';
 import { RouteLayer } from './RouteLayer';
 import { StartMarker } from './StartMarker';
 import { DestinationMarker } from './DestinationMarker';
-import { MapLayerControl, type LayerVisibilityState } from './MapLayerControl';
-import { mockRoute } from '../data/mockRoute';
-import { mockIcebergs } from '../data/mockIcebergs';
+import { RiskLegend } from './RiskLegend';
+import { type LayerVisibilityState } from './MapLayerControl';
+import { mockRoutes, type RouteData } from '../data/mockRoute';
+import { mockIcebergs, type Iceberg } from '../data/mockIceberg';
+import { mockHeatmapPoints } from '../data/mockHeatmap';
+
+// Compute initial bounding box encompassing all route waypoints and iceberg positions
+const allLocations: [number, number][] = [
+  ...mockRoutes.flatMap((r) => r.coordinates),
+  ...mockIcebergs.map((iceberg): [number, number] => [iceberg.latitude, iceberg.longitude]),
+];
+const initialBounds = L.latLngBounds(allLocations.map((pos) => L.latLng(pos[0], pos[1])));
+
+/**
+ * Leaflet helper component that automatically re-fits map bounds when selected route changes.
+ */
+const FitBoundsToRoute: React.FC<{ route: RouteData }> = ({ route }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (route && route.coordinates && route.coordinates.length > 0) {
+      const bounds = L.latLngBounds(route.coordinates.map((c) => L.latLng(c[0], c[1])));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 8 });
+    }
+  }, [map, route]);
+  return null;
+};
+
+/**
+ * Leaflet helper component that triggers map.invalidateSize() when sidebars collapse/expand
+ * or window resizes, ensuring tiles redraw properly to fill container space.
+ */
+const MapResizeHandler: React.FC<{ isLeftOpen?: boolean; isRightOpen?: boolean }> = ({
+  isLeftOpen,
+  isRightOpen,
+}) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 320);
+    return () => clearTimeout(timer);
+  }, [map, isLeftOpen, isRightOpen]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [map]);
+
+  return null;
+};
+
+interface AntarcticMapProps {
+  routes?: RouteData[];
+  selectedRouteId?: string;
+  onSelectRouteId?: (id: string) => void;
+  layers?: LayerVisibilityState;
+  isLeftOpen?: boolean;
+  isRightOpen?: boolean;
+  selectedIcebergId?: string | null;
+  onSelectIceberg?: (iceberg: Iceberg) => void;
+}
 
 /**
  * AntarcticMap is the central map component displaying separate geospatial layers,
- * navigation route visualization, start/destination markers, layer controls, and a route info panel.
+ * navigation route visualization, start/destination markers, and sea-ice/ocean layers.
  */
-export const AntarcticMap: React.FC = () => {
-  // Map viewport default coordinates centered over the Antarctic Peninsula route
-  const center: [number, number] = [-66.0, -66.0];
-  const zoom = 5;
-
-  // Layer visibility state
-  const [layers, setLayers] = useState<LayerVisibilityState>({
+export const AntarcticMap: React.FC<AntarcticMapProps> = ({
+  routes = mockRoutes,
+  selectedRouteId = mockRoutes[0].id,
+  layers = {
     icebergs: true,
+    heatmap: true,
+    seaIce: true,
+    oceanCurrents: true,
     route: true,
-    startDestination: true
-  });
-
-  const handleToggleLayer = (layerKey: keyof LayerVisibilityState) => {
-    setLayers(prev => ({
-      ...prev,
-      [layerKey]: !prev[layerKey]
-    }));
-  };
+    startDestination: true,
+  },
+  isLeftOpen,
+  isRightOpen,
+  selectedIcebergId,
+  onSelectIceberg,
+}) => {
+  const selectedRoute = routes.find((r) => r.id === selectedRouteId) || routes[0] || mockRoutes[0];
+  const selectedIceberg = mockIcebergs.find((i) => i.id === selectedIcebergId);
 
   return (
-    <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      
-      {/* Route Information Overlay Panel */}
-      <div className="route-info-panel">
-        <div className="panel-header">
-          <span className="panel-icon">⚓</span>
-          <h3>ROUTE INFORMATION</h3>
-        </div>
-        <div className="panel-content">
-          <div className="info-row">
-            <span className="info-label">Route Name:</span>
-            <span className="info-value text-highlight">{mockRoute.name}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Distance:</span>
-            <span className="info-value">{mockRoute.distanceKm} km</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Risk:</span>
-            <span className={`risk-badge risk-${mockRoute.riskLevel.toLowerCase()}`}>
-              {mockRoute.riskLevel}
-            </span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Status:</span>
-            <span className="status-recommended">{mockRoute.status}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Est. Time:</span>
-            <span className="info-value">{mockRoute.estimatedTimeHours} hrs</span>
-          </div>
-        </div>
-        <div className="fastapi-prep-footer">
-          <span className="backend-tag">⚡ FastAPI Ready</span>
-        </div>
-      </div>
-
-      {/* Layer Controls Panel */}
-      <MapLayerControl 
-        layers={layers} 
-        onToggleLayer={handleToggleLayer}
-        icebergCount={mockIcebergs.length}
-      />
+    <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {/* Floating Bottom-Left Risk Legend Card */}
+      <RiskLegend />
 
       {/* Main Leaflet Map Container */}
       <MapContainer
-        center={center}
-        zoom={zoom}
+        bounds={initialBounds}
+        boundsOptions={{ padding: [50, 50] }}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
-        {/* Base Map Tile Layer */}
+        {/* Resize Handler for sidebar collapse reflow & window resize */}
+        <MapResizeHandler isLeftOpen={isLeftOpen} isRightOpen={isRightOpen} />
+
+        {/* Helper to fit bounds on route selection change */}
+        <FitBoundsToRoute route={selectedRoute} />
+
+        {/* Esri World Imagery Satellite Base Map Tile Layer */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
         />
 
-        {/* Iceberg Layer */}
-        {layers.icebergs && <IcebergLayer icebergs={mockIcebergs} />}
+        {/* Risk Heatmap Layer */}
+        {layers.heatmap && <HeatmapLayer points={mockHeatmapPoints} />}
 
-        {/* Navigation Route Layer */}
-        {layers.route && <RouteLayer routeData={mockRoute} />}
+        {/* Sea-Ice Pack Extent Layer */}
+        {layers.seaIce && <SeaIceLayer />}
+
+        {/* Ocean Currents Flow Vector Layer */}
+        {layers.oceanCurrents && <OceanCurrentsLayer />}
+
+        {/* Iceberg Marker Layer */}
+        {layers.icebergs && (
+          <IcebergLayer icebergs={mockIcebergs} onSelectIceberg={onSelectIceberg} />
+        )}
+
+        {/* 24-Hour Predicted Position Vector Line for Selected Iceberg */}
+        {layers.icebergs && selectedIceberg && selectedIceberg.predictedPosition24h && (
+          <>
+            <Polyline
+              positions={[
+                [selectedIceberg.latitude, selectedIceberg.longitude],
+                [selectedIceberg.predictedPosition24h.latitude, selectedIceberg.predictedPosition24h.longitude],
+              ]}
+              pathOptions={{
+                color: '#a78bfa',
+                weight: 2,
+                dashArray: '6, 6',
+                opacity: 0.9,
+              }}
+            />
+            <CircleMarker
+              center={[
+                selectedIceberg.predictedPosition24h.latitude,
+                selectedIceberg.predictedPosition24h.longitude,
+              ]}
+              radius={6}
+              pathOptions={{
+                color: '#a78bfa',
+                fillColor: '#c084fc',
+                fillOpacity: 0.8,
+                dashArray: '3, 3',
+              }}
+            >
+              <Popup className="prediction-popup">
+                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#5b21b6' }}>
+                  🎯 24H Predicted Target ({selectedIceberg.id})
+                </div>
+              </Popup>
+            </CircleMarker>
+          </>
+        )}
+
+        {/* Navigation Route Layer & Animated Vessel */}
+        {layers.route && <RouteLayer routeData={selectedRoute} />}
 
         {/* Start & Destination Markers Layer */}
         {layers.startDestination && (
           <>
-            <StartMarker location={mockRoute.startLocation} />
-            <DestinationMarker location={mockRoute.destinationLocation} />
+            <StartMarker location={selectedRoute.startLocation} />
+            <DestinationMarker location={selectedRoute.destinationLocation} />
           </>
         )}
       </MapContainer>
