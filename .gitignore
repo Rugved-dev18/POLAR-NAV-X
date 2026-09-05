@@ -113,8 +113,9 @@ data/processed/*.tiff
 *.pth
 *.onnx
 *.pb
-models/
 checkpoints/
+# Keep ml/models/ for our trained XGBoost models
+!ml/models/
 
 # Logs
 *.log
