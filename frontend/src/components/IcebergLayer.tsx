@@ -1,6 +1,6 @@
 import React from 'react';
 import { IcebergMarker } from './IcebergMarker';
-import { mockIcebergs, type Iceberg } from '../data/mockIcebergs';
+import { mockIcebergs, type Iceberg } from '../data/mockIceberg';
 
 interface IcebergLayerProps {
   icebergs?: Iceberg[];

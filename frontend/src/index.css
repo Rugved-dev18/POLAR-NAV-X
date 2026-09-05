@@ -24,14 +24,14 @@ body,
 .route-info-panel {
   position: absolute;
   top: 16px;
-  left: 16px;
+  left: 56px; /* Offset to clear Leaflet zoom control buttons */
   z-index: 1000;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 16px;
-  width: 260px;
+  width: 280px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
 }
@@ -66,7 +66,33 @@ body,
 .panel-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.route-select-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.route-dropdown {
+  background: rgba(30, 41, 59, 0.9);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.route-dropdown:hover {
+  border-color: #38bdf8;
+  background: rgba(15, 23, 42, 0.95);
 }
 
 .info-row {
@@ -74,22 +100,24 @@ body,
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
+  gap: 8px;
 }
 
 .info-label {
   color: #94a3b8;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .info-value {
   color: #f8fafc;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .text-highlight {
   color: #7dd3fc;
   font-size: 12px;
-  max-width: 140px;
   text-align: right;
   white-space: nowrap;
   overflow: hidden;
@@ -128,24 +156,14 @@ body,
   color: #38bdf8;
   font-weight: 700;
   font-size: 12px;
+  white-space: nowrap;
 }
 
-.fastapi-prep-footer {
-  margin-top: 12px;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: flex-end;
-}
-
-.backend-tag {
-  font-size: 10px;
-  font-weight: 600;
-  color: #a7f3d0;
-  background: rgba(16, 185, 129, 0.15);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.status-caution {
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 /* Floating Layer Control Panel (Top-Right) */

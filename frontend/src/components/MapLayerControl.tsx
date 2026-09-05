@@ -2,6 +2,7 @@ import React from 'react';
 
 export interface LayerVisibilityState {
   icebergs: boolean;
+  heatmap: boolean;
   route: boolean;
   startDestination: boolean;
 }
@@ -18,7 +19,7 @@ interface MapLayerControlProps {
 export const MapLayerControl: React.FC<MapLayerControlProps> = ({
   layers,
   onToggleLayer,
-  icebergCount = 5,
+  icebergCount = 8,
 }) => {
   return (
     <div className="map-layer-control-panel">
@@ -38,6 +39,18 @@ export const MapLayerControl: React.FC<MapLayerControlProps> = ({
             <span className="layer-symbol">🧊</span> Iceberg Layer
           </span>
           <span className="layer-badge">{icebergCount}</span>
+        </label>
+
+        <label className={`layer-toggle-item ${layers.heatmap ? 'active' : ''}`}>
+          <input
+            type="checkbox"
+            checked={layers.heatmap}
+            onChange={() => onToggleLayer('heatmap')}
+          />
+          <span className="toggle-label">
+            <span className="layer-symbol">🔥</span> Risk Heatmap
+          </span>
+          <span className="layer-badge status-badge">Density</span>
         </label>
 
         <label className={`layer-toggle-item ${layers.route ? 'active' : ''}`}>
