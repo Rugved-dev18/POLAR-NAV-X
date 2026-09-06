@@ -1696,3 +1696,37 @@ body,
   border-color: rgba(245, 158, 11, 0.5);
   color: #fbbf24;
 }
+
+/* Iceberg 24h prediction action */
+.predict-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.predict-btn:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.25);
+}
+
+.predict-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prediction-status {
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}

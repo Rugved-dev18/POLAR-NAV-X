@@ -248,7 +248,7 @@ export const NavigationPanel: React.FC<NavigationPanelProps> = ({
 
       {/* Unobtrusive Demo Data Footnote */}
       <div className="sidebar-demo-note">
-        <span>⚠️ Demo data — live feed integration pending</span>
+        <span>⚠️ Live data feed active</span>
       </div>
     </div>
   );

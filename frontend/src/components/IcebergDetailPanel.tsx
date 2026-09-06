@@ -4,11 +4,17 @@ import { type Iceberg } from '../data/mockIceberg';
 interface IcebergDetailPanelProps {
   selectedIceberg: Iceberg | null;
   onClose: () => void;
+  onPredict?: (iceberg: Iceberg) => void;
+  predictionLoading?: boolean;
+  predictionError?: string | null;
 }
 
 export const IcebergDetailPanel: React.FC<IcebergDetailPanelProps> = ({
   selectedIceberg,
   onClose,
+  onPredict,
+  predictionLoading,
+  predictionError,
 }) => {
   if (!selectedIceberg) {
     return (
@@ -106,6 +112,23 @@ export const IcebergDetailPanel: React.FC<IcebergDetailPanelProps> = ({
             <span className="detail-label">Source:</span>
             <span className="detail-value">{selectedIceberg.source}</span>
           </div>
+        )}
+
+        {onPredict && (
+          <div className="detail-row" style={{ marginTop: '8px' }}>
+            <button
+              className="predict-btn"
+              onClick={() => onPredict(selectedIceberg)}
+              disabled={predictionLoading}
+              aria-label="Predict 24-hour iceberg trajectory"
+            >
+              {predictionLoading ? 'Predicting trajectory…' : 'Predict 24h'}
+            </button>
+          </div>
+        )}
+
+        {predictionError && (
+          <div className="prediction-status error">{predictionError}</div>
         )}
       </div>
 

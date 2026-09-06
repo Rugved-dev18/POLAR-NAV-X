@@ -50,7 +50,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onNavigateToLanding }) => {
       </div>
 
       <div className="top-bar-right">
-        <span className="demo-data-badge">Demo data — live feed integration pending</span>
+        <span className="demo-data-badge">Live data feed active</span>
 
         <div className="utc-clock">
           <span className="clock-icon">🕒</span>

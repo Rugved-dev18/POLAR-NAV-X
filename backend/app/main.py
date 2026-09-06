@@ -7,7 +7,14 @@ from fastapi import FastAPI, HTTPException
 
 from app.iceberg_service import IcebergDataError, iceberg_service
 from app.model_service import ModelLoadError, model_service
-from app.schemas import HealthResponse, Iceberg, PredictionRequest, PredictionResponse
+from app.prediction_service import PredictionNotAvailableError, prediction_service
+from app.schemas import (
+    HealthResponse,
+    Iceberg,
+    IcebergPredictionResponse,
+    PredictionRequest,
+    PredictionResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -65,3 +72,15 @@ def icebergs():
         )
 
     return [Iceberg(**record) for record in records]
+
+
+@app.post("/api/icebergs/{iceberg_id}/predict", response_model=IcebergPredictionResponse)
+def predict_iceberg(iceberg_id: str):
+    """Predict the 24-hour position for a live iceberg using its movement history."""
+    try:
+        result = prediction_service.predict_or_unavailable(iceberg_id)
+    except Exception:
+        logger.exception("Iceberg prediction request failed for %s", iceberg_id)
+        raise HTTPException(status_code=500, detail="Prediction request failed")
+
+    return IcebergPredictionResponse(**result)

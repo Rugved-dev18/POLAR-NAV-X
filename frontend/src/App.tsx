@@ -9,6 +9,7 @@ import OceanCurrentWeatherPanel from './components/OceanCurrentWeatherPanel';
 import { mockRoutes, type RouteData } from './data/mockRoute';
 import { type Iceberg } from './data/mockIceberg';
 import { fetchIcebergs } from './api/icebergs';
+import { predictIceberg } from './api/predictions';
 import { type LayerVisibilityState } from './components/MapLayerControl';
 
 /**
@@ -33,10 +34,20 @@ function App() {
   // Shared selected iceberg state across Map and Right Details Panel
   const [selectedIcebergId, setSelectedIcebergId] = useState<string | null>(null);
 
+  // Clear prediction feedback when the user selects a different iceberg
+  useEffect(() => {
+    setPredictionLoading(false);
+    setPredictionError(null);
+  }, [selectedIcebergId]);
+
   // Live iceberg data fetched from the FastAPI backend
   const [icebergs, setIcebergs] = useState<Iceberg[]>([]);
   const [icebergsLoading, setIcebergsLoading] = useState<boolean>(true);
   const [icebergsError, setIcebergsError] = useState<string | null>(null);
+
+  // 24-hour prediction state for the selected iceberg
+  const [predictionLoading, setPredictionLoading] = useState<boolean>(false);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
 
   const selectedIceberg = icebergs.find((i) => i.id === selectedIcebergId) || null;
 
@@ -84,6 +95,46 @@ function App() {
   const handleSelectIceberg = (iceberg: Iceberg) => {
     setSelectedIcebergId(iceberg.id);
     setIsRightOpen(true); // Automatically expand right sidebar if collapsed when marker clicked
+  };
+
+  const handlePredictIceberg = async (iceberg: Iceberg) => {
+    setPredictionLoading(true);
+    setPredictionError(null);
+
+    try {
+      const result = await predictIceberg(iceberg.id);
+
+      if (
+        result.prediction_available &&
+        result.predicted_latitude !== undefined &&
+        result.predicted_longitude !== undefined
+      ) {
+        const { iceberg_id, predicted_latitude, predicted_longitude } = result;
+        setIcebergs((prev) =>
+          prev.map((i) =>
+            i.id === iceberg_id
+              ? {
+                  ...i,
+                  predictedPosition24h: {
+                    latitude: predicted_latitude,
+                    longitude: predicted_longitude,
+                  },
+                }
+              : i
+          )
+        );
+      } else {
+        setPredictionError(
+          result.reason || 'Prediction unavailable — insufficient historical movement data.'
+        );
+      }
+    } catch (err) {
+      setPredictionError(
+        err instanceof Error ? err.message : 'Trajectory prediction unavailable.'
+      );
+    } finally {
+      setPredictionLoading(false);
+    }
   };
 
   if (currentView === 'landing') {
@@ -173,6 +224,9 @@ function App() {
               <IcebergDetailPanel
                 selectedIceberg={selectedIceberg}
                 onClose={() => setSelectedIcebergId(null)}
+                onPredict={handlePredictIceberg}
+                predictionLoading={predictionLoading}
+                predictionError={predictionError}
               />
 
               <div className="sidebar-card-divider" />

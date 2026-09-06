@@ -54,6 +54,7 @@ lerna-debug.log*
 dist/
 dist-ssr/
 *.local
+*.tsbuildinfo
 .vercel/
 .netlify/
 .next/

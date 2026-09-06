@@ -49,3 +49,17 @@ class Iceberg(BaseModel):
     width_nm: Optional[float] = Field(None, description="Width in nautical miles")
     last_updated: Optional[date] = Field(None, description="Observation/update date")
     source: str = Field(..., description="Upstream source the record came from")
+
+
+class IcebergPredictionResponse(BaseModel):
+    """XGBoost 24-hour prediction result for a live iceberg, or an unavailable reason."""
+
+    iceberg_id: str
+    prediction_available: bool
+    current_latitude: Optional[float] = None
+    current_longitude: Optional[float] = None
+    predicted_latitude: Optional[float] = None
+    predicted_longitude: Optional[float] = None
+    prediction_horizon_days: Optional[float] = None
+    model: Optional[str] = None
+    reason: Optional[str] = None
