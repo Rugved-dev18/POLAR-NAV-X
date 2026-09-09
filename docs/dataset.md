@@ -6,14 +6,14 @@
 
 **PolarNavX_XGBoost_Training**
 
-### Dataset Purpose
+### Dataset Purpose  
 
 This dataset is the processed historical iceberg-movement dataset used
 to train the XGBoost trajectory prediction models in POLAR-NAV-X.
 
 The dataset provides historical iceberg positions and derived movement
 features that allow the model to learn relationships between an
-iceberg's previous movement and its future position.
+iceberg's previous movement and its future position in the antartic Region
 
 The trained XGBoost models predict:
 
